@@ -10,3 +10,6 @@ body{
 #tasklist::-webkit-scrollbar{
 display: none;
 }
+.my-icon{
+  cursor: pointer;
+}

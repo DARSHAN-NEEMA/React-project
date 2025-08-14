@@ -1,16 +1,16 @@
 import React, { useState } from "react";
+import { ToastContainer } from "react-toastify";
 
-const Login = ({handleLogin} ) => {
- 
+const Login = ({ handleLogin }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const submtHandler = (e) => {
     e.preventDefault();
-    handleLogin(email,password)
+    handleLogin(email, password);
     // console.log("email is ",email);
     // console.log("Password is ",password);
-    setEmail('')
-    setPassword('')
+    setEmail("");
+    setPassword("");
   };
 
   return (
@@ -46,6 +46,7 @@ const Login = ({handleLogin} ) => {
           <button className=" mt-5 border-2 border-emerald-600 py-3 px-5 rounded-full text-xl text-white outline-none bg-emerald-500 border-none ">
             Log in{" "}
           </button>
+          
         </form>
       </div>
     </div>

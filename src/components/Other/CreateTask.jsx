@@ -1,21 +1,59 @@
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
+import { AuthProvider } from "../../context/AuthContext";
 
 const CreateTask = () => {
+const [userData,setUserData] = useContext(AuthProvider);
+
+
   const [TaskTitle, setTaskTitle] = useState("");
   const [description, setDescription] = useState("");
   const [taskDate, setTaskDate] = useState("");
   const [assinTo, setAssignTo] = useState("");
   const [category, setCategory] = useState("");
-  const [task,setTask]=useState([])
+  const [newTask, setNewTask] = useState({});
+  // useEffect(() => {
+  //   console.log(newTask);
+  // }, [task]);
 
   const submitHandleter = (e) => {
     e.preventDefault();
+    setNewTask({
+      TaskTitle,
+      description,
+      taskDate,
+      category,
+      active: false,
+      newTask: true,
+      failed: false,
+      completed: false,
+    });
+
+    const Udata =userData.employees
+
+    // console.log(Udata);
+    
+    // console.log(user)
+    if (Array.isArray(Udata)) {
+      Udata.forEach((elem) => {
+        if (assinTo == elem.name) {
+          if (!Array.isArray(elem.tasks)) elem.tasks = [];
+          elem.tasks.push(newTask);
+          elem.taskStats.newTask =elem.taskStats.newTask +1
+          // console.log(elem);
+        }
+      });
+      // console.log(Udata)
+
+
+    } else {
+      console.log("No employee data found in localStorage.");
+    }
+
     setAssignTo("");
     setTaskDate("");
     setDescription("");
     setCategory("");
     setTaskTitle("");
-    setTask([])
   };
 
   return (
@@ -41,11 +79,11 @@ const CreateTask = () => {
               />
             </div>
             <div>
-              <h3 className="text-sm text-gray-300 mb-0.5">Date</h3>
+              <h3 className="text-sm text-gray-300 mb-0.5">DeadLine</h3>
               <input
                 value={taskDate}
                 onChange={(e) => {
-                  setTaskDate(e.target.valueAsDate);
+                  setTaskDate(e.target.value);
                 }}
                 className="text-sm py-1 px-2 w-4/5 rounded outline-none bg-transparent border-gray-400 border-[1px]"
                 type="date"
