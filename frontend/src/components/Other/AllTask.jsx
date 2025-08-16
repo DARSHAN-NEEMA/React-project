@@ -1,14 +1,12 @@
 import React, { useContext } from "react";
 import { AuthProvider } from "../../context/AuthContext";
 import {
-  RiArrowDropDownFill,
-  RiArrowRightBoxFill,
   RiArrowRightDoubleFill,
-  RiLink,
 } from "@remixicon/react";
 
-const AllTask = () => {
+const AllTask = (props)  => {
   const [userData, setUserData] = useContext(AuthProvider);
+  
   return (
     <div className="bg-[#1c1c1c] p-5  ">
       <div className="bg-gray-800 mb-2  py-2 px-4 justify-between rounded border-[1px] border-separate  flex">
@@ -34,15 +32,16 @@ const AllTask = () => {
                 {elem.taskStats?.completed}
               </h5>
               <h5 className="w-1/5 text-red-600">{elem.taskStats?.failed}</h5>
-              {/* <Link to='#'> */}
-              <RiArrowRightDoubleFill  color="white" className="my-icon" />
-              {/* </Link>            */}
+              <button onClick={()=>{ props.setToggle(false)}}>
+               <RiArrowRightDoubleFill  color="white" className="my-icon" />
+              </button>           
             </div>
           ))
         ) : (
           <div className="text-white">No employee data available.</div>
         )}
       </div>
+    
     </div>
   );
 };

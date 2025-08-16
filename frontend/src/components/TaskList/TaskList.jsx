@@ -4,6 +4,7 @@ import NewTask from './NewTask'
 import CompleteTask from './CompleteTask'
 import FaildTask from './FaildTask'
 
+
 const TaskList = ({data}) => {
    
   return (
@@ -25,6 +26,8 @@ const TaskList = ({data}) => {
                 />
             }
         })}
+
+        
         {/* <AcceptTask/>
         <NewTask/>
         <CompleteTask/>

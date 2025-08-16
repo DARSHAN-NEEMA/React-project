@@ -6,6 +6,8 @@ import { getLocalStorage, setLocalStorage } from "./utils/localStorage";
 import { AuthProvider } from "./context/AuthContext";
 import { Bounce, toast, ToastContainer } from "react-toastify";
 
+import UserProfile from "./pages/UserProfile";
+
 const App = () => {
   const [user, setUser] = useState(null);
   const [logInUser, setLogInUser] = useState(null);
@@ -58,7 +60,17 @@ const App = () => {
         }
       }
     } else {
-      alert("Invalid credentials");
+      toast.error("InValid Credentials", {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "dark",
+            transition: Bounce,
+          });
     }
   };
 
@@ -94,19 +106,17 @@ const App = () => {
       ) : null}
       <ToastContainer
             position="top-right"
-            autoClose={5000}
+            autoClose={2000}
             hideProgressBar={false}
             newestOnTop={false}
             closeOnClick
             rtl={false}
-            pauseOnFocusLoss
             draggable
             pauseOnHover
             theme="dark"
             transition={Bounce}
           />
-      {/* <EmployeeDashboard/> */}
-      {/* <AdminDeshboard/> */}
+      
     </>
   );
 };

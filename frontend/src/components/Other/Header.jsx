@@ -21,18 +21,21 @@ const Header = (props) => {
     // window.location.reload()
   };
   return (
-    <div className="flex items-center justify-between ">
-      <h1 className="text-2xl font-semibold">
-        Hello <br />
-        <span className="text-3xl font-semibold">{useName}✌️</span>
-      </h1>
-      <button
-        onClick={logOutUser}
-        className="bg-red-400 h-15 text-white w-40 py-5 px-3 rounded-sm text-xl font-medium"
-      >
-        Log Out
-      </button>
-    </div>
+    <div className="flex items-center justify-between bg-white shadow-md p-6 rounded-lg">
+  <h1 className="text-2xl font-semibold leading-snug">
+    Hello 👋
+    <br />
+    <span className="text-3xl font-bold text-blue-600">{useName}</span>
+  </h1>
+  
+  <button
+    onClick={logOutUser}
+    className="bg-red-500 hover:bg-red-600 transition-colors duration-300 text-white py-3 px-6 rounded-md text-lg font-medium shadow-md"
+  >
+    Log Out
+  </button>
+</div>
+
   );
 };
 
