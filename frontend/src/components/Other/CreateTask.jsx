@@ -1,138 +1,202 @@
-import React, { useContext, useEffect, useState } from "react";
-import { AuthProvider } from "../../context/AuthContext";
+import React, { useContext, useState, useEffect } from "react";
+import { AuthContext } from "../../context/AuthContext";
+import axios from "axios";
 
 const CreateTask = () => {
-const [userData,setUserData] = useContext(AuthProvider);
-
+  const { userData } = useContext(AuthContext);
 
   const [TaskTitle, setTaskTitle] = useState("");
   const [description, setDescription] = useState("");
   const [taskDate, setTaskDate] = useState("");
-  const [assinTo, setAssignTo] = useState("");
+  const [assignTo, setAssignTo] = useState("");
   const [category, setCategory] = useState("");
-  const [newTask, setNewTask] = useState({});
-  // useEffect(() => {
-  //   console.log(newTask);
-  // }, [task]);
+  const [status, setStatus] = useState("new");
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
+  const [employees, setEmployees] = useState([]); 
 
-  const submitHandleter = (e) => {
-    e.preventDefault();
-    setNewTask({
-      TaskTitle,
-      description,
-      taskDate,
-      category,
-      active: false,
-      newTask: true,
-      failed: false,
-      completed: false,
-    });
-
-    const Udata =userData.employees
-
-    // console.log(Udata);
-    
-    // console.log(user)
-    if (Array.isArray(Udata)) {
-      Udata.forEach((elem) => {
-        if (assinTo == elem.name) {
-          if (!Array.isArray(elem.tasks)) elem.tasks = [];
-          elem.tasks.push(newTask);
-          elem.taskStats.newTask =elem.taskStats.newTask +1
-          // console.log(elem);
-        }
+  
+ useEffect(() => {
+  const fetchEmployees = async () => {
+    try {
+      const res = await axios.get("http://localhost:5000/api/v1/admin/employees/name", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
       });
-      // console.log(Udata)
 
 
-    } else {
-      console.log("No employee data found in localStorage.");
+      setEmployees(res.data.data); 
+    } catch (err) {
+      console.error("Error fetching employees:", err);
     }
+  };
 
-    setAssignTo("");
-    setTaskDate("");
-    setDescription("");
-    setCategory("");
-    setTaskTitle("");
+  fetchEmployees();
+}, []);
+
+  const submitHandler = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setMessage("");
+
+    try {
+      const employee = employees.find(
+        (emp) => emp.name.toLowerCase() === assignTo.toLowerCase()
+      );
+
+      if (!employee) {
+        setMessage("❌ Employee not found!");
+        setLoading(false);
+        return;
+      }
+
+        const res = await axios.post(
+  `http://localhost:5000/api/v1/admin/employees/${employee._id}/tasks`,
+  {
+    title: TaskTitle,
+    description,
+    date: taskDate,
+    category,
+    status,
+  },
+  {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+    withCredentials: true,
+  }
+);
+
+
+      setMessage("Task created successfully!");
+      console.log(res.data);
+
+      // reset form
+      setTaskTitle("");
+      setTaskDate("");
+      setAssignTo("");
+      setCategory("");
+      setDescription("");
+      setStatus("new");
+    } catch (err) {
+      console.error(err);
+      setMessage("❌ Failed to create task.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div>
       <div className="p-5 bg-[#1c1c1c] mt-7 rounded">
         <form
-          onSubmit={(e) => {
-            submitHandleter(e);
-          }}
-          className=" flex w-full  items-start justify-between "
+          onSubmit={submitHandler}
+          className="flex w-full items-start justify-between"
         >
+          {/* Left Side */}
           <div className="w-1/2">
+            {/* Task Title */}
             <div>
-              <h3 className="text-sm text-gray-300 mb-0.5">Task tile</h3>
+              <h3 className="text-sm text-gray-300 mb-0.5">Task Title</h3>
               <input
                 value={TaskTitle}
-                onChange={(e) => {
-                  setTaskTitle(e.target.value);
-                }}
+                onChange={(e) => setTaskTitle(e.target.value)}
                 className="text-sm py-1 px-2 w-4/5 rounded outline-none bg-transparent border-gray-400 border-[1px]"
                 type="text"
                 placeholder="Task Title"
+                required
               />
             </div>
+
+            {/* Deadline */}
             <div>
-              <h3 className="text-sm text-gray-300 mb-0.5">DeadLine</h3>
+              <h3 className="text-sm text-gray-300 mb-0.5">Deadline</h3>
               <input
                 value={taskDate}
-                onChange={(e) => {
-                  setTaskDate(e.target.value);
-                }}
+                onChange={(e) => setTaskDate(e.target.value)}
                 className="text-sm py-1 px-2 w-4/5 rounded outline-none bg-transparent border-gray-400 border-[1px]"
                 type="date"
-                placeholder="Date"
+                required
               />
             </div>
+
+            {/* Assign To with autocomplete */}
             <div>
               <h3 className="text-sm text-gray-300 mb-0.5">Assign To</h3>
               <input
-                value={assinTo}
-                onChange={(e) => {
-                  setAssignTo(e.target.value);
-                }}
+                list="employeeList"
+                value={assignTo}
+                onChange={(e) => setAssignTo(e.target.value)}
                 className="text-sm py-1 px-2 w-4/5 rounded outline-none bg-transparent border-gray-400 border-[1px]"
                 type="text"
-                placeholder="Name of Employee name"
+                placeholder="Employee Name"
+                required
               />
+              <datalist id="employeeList">
+                {employees.map((emp) => (
+                  <option key={emp._id} value={emp.name} />
+                ))}
+              </datalist>
             </div>
+
+            {/* Category */}
             <div>
-              <h3 className="text-sm text-gray-300 mb-0.5">category</h3>
+              <h3 className="text-sm text-gray-300 mb-0.5">Category</h3>
               <input
                 value={category}
-                onChange={(e) => {
-                  setCategory(e.target.value);
-                }}
+                onChange={(e) => setCategory(e.target.value)}
                 className="text-sm py-1 px-2 w-4/5 rounded outline-none bg-transparent border-gray-400 border-[1px]"
                 type="text"
                 placeholder="dev, design, etc"
               />
             </div>
+
+            {/* Status */}
+            <div>
+              <h3 className="text-sm text-gray-300 mb-0.5">Status</h3>
+              <select
+                value={status}
+                onChange={(e) => setStatus(e.target.value)}
+                className="text-sm py-1 px-2 w-4/5 rounded outline-none bg-[#1c1c1c] border-gray-400 border-[1px]"
+              >
+                <option className="bg-gray-800" value="new">
+                  New
+                </option>
+                <option className="bg-gray-800" value="active">
+                  Active
+                </option>
+                <option className="bg-gray-800" value="completed">
+                  Completed
+                </option>
+                <option className="bg-gray-800" value="failed">
+                  Failed
+                </option>
+              </select>
+            </div>
           </div>
 
+          {/* Right Side */}
           <div className="w-1/2">
             <h3 className="text-sm text-gray-300 mb-0.5">Description</h3>
             <textarea
               value={description}
-              onChange={(e) => {
-                setDescription(e.target.value);
-              }}
+              onChange={(e) => setDescription(e.target.value)}
               className="w-full h-44 text-sm py-2 px-2 rounded outline-none bg-transparent border-[1px] border-gray-400"
-              name=""
-              id=""
+              required
             ></textarea>
             <button
               className="bg-emerald-500 hover:bg-emerald-600 px-5 rounded text-sm mt-4 w-full h-10"
               type="submit"
+              disabled={loading}
             >
-              Create Task
+              {loading ? "Creating..." : "Create Task"}
             </button>
+            {message && (
+              <p className="mt-2 text-sm text-center text-gray-300">
+                {message}
+              </p>
+            )}
           </div>
         </form>
       </div>

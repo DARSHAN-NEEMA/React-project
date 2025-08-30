@@ -21,7 +21,7 @@ const Header = (props) => {
     // window.location.reload()
   };
   return (
-    <div className="flex items-center justify-between bg-white shadow-md p-6 rounded-lg">
+    <div className="flex items-center justify-between bg-[#1c1c1c] shadow-md p-6 rounded-lg">
   <h1 className="text-2xl font-semibold leading-snug">
     Hello 👋
     <br />

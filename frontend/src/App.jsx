@@ -1,122 +1,45 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect } from "react";
 import Login from "./components/Auth/Login";
 import EmployeeDashboard from "./components/Darshboard/EmployeeDashboard";
 import AdminDeshboard from "./components/Darshboard/AdminDeshboard";
-import { getLocalStorage, setLocalStorage } from "./utils/localStorage";
-import { AuthProvider } from "./context/AuthContext";
-import { Bounce, toast, ToastContainer } from "react-toastify";
-
-import UserProfile from "./pages/UserProfile";
+import { AuthContext } from "./context/AuthContext";
+import { ToastContainer, Bounce } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const App = () => {
-  const [user, setUser] = useState(null);
-  const [logInUser, setLogInUser] = useState(null);
+  const { userData, setUserData } = useContext(AuthContext);
 
-  const [userData, setUserData] = useContext(AuthProvider);
-
+  
   useEffect(() => {
-    try {
-      const logInUser = localStorage.getItem("logInUser");
-      if (logInUser) {
-        const userDatas = JSON.parse(logInUser);
-        setUser(userDatas.role);
-        setLogInUser(userDatas.data);
-      }
-    } catch (e) {
-      console.log(e);
+    const savedUser = localStorage.getItem("userData");
+    if (savedUser) {
+      setUserData(JSON.parse(savedUser));
     }
-  }, []);
-  const handleLogin = (email, password) => {
-    if (email == "admin@me.com" && password == "123") {
-      setUser("admin");
-      localStorage.setItem("logInUser", JSON.stringify({ role: "admin" }));
-    } else if (userData && Array.isArray(userData.employees)) {
-      const emp = userData.employees.find(
-        (e) => email == e.email && e.password == password
-      );
-      if (emp) {
-        setUser("employee");
-        setLogInUser(emp);
-        localStorage.setItem(
-          "logInUser",
-          JSON.stringify({ role: "employee", data: emp })
-        );
-      } else {
-        try{
+  }, [setUserData]);
 
-          toast.error("InValid Credentials", {
-            position: "top-right",
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "dark",
-            transition: Bounce,
-          });
-        }catch(e){
-          console.log(e)
-        }
-      }
-    } else {
-      toast.error("InValid Credentials", {
-            position: "top-right",
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "dark",
-            transition: Bounce,
-          });
-    }
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("refreshToken");
+    localStorage.removeItem("userData"); // ✅ clear saved user
+    setUserData(null);
   };
 
-  // const handleLogin = (email, password) => {
-  //   if (email == "admin@me.com" && password == "123") {
-  //     setUser("admin");
-  //     localStorage.setItem("logInUser", JSON.stringify({ role: "admin" }));
-  //   } else if (userData) {
-  //     const emp = userData.find(
-  //       (e) => email == e.email && e.password == password
-  //     );
-  //     if (emp) {
-  //       setUser("employee");
-  //       setLogInUser(emp);
-  //       localStorage.setItem(
-  //         "logInUser",
-  //         JSON.stringify({ role: "employee", data: emp })
-  //       );
-  //     }
-  //   } else {
-  //     alert("Invalid credentials");
-  //   }
-  // };
-
-  // handleLogin("admin@me.com",123);
   return (
     <>
-      {!user ? <Login handleLogin={handleLogin} /> : ""}
-      {user == "admin" ? (
-        <AdminDeshboard changeUser={setUser} />
-      ) : user == "employee" ? (
-        <EmployeeDashboard changeUser={setUser} data={logInUser} />
-      ) : null}
+      {!userData ? (
+        <Login setUserData={setUserData} />
+      ) : userData.role === "admin" ? (
+        <AdminDeshboard changeUser={handleLogout} />
+      ) : (
+        <EmployeeDashboard changeUser={handleLogout} data={userData} />
+      )}
+
       <ToastContainer
-            position="top-right"
-            autoClose={2000}
-            hideProgressBar={false}
-            newestOnTop={false}
-            closeOnClick
-            rtl={false}
-            draggable
-            pauseOnHover
-            theme="dark"
-            transition={Bounce}
-          />
-      
+        position="top-right"
+        autoClose={2000}
+        theme="dark"
+        transition={Bounce}
+      />
     </>
   );
 };
